@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -48,7 +49,8 @@ Route::get('mail/test', [MailController::class, 'test']);
 // or
 // Route::get('mail/test', 'App\Http\Controllers\MailController@test');
 
-
+use App\Http\Controllers\FileController;
+Route::resource('files', FileController::class);
 
 
 require __DIR__.'/auth.php';
