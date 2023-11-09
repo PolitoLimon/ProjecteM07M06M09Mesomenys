@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
@@ -15,8 +16,8 @@ class FileController extends Controller
         return view("files.index", [
             "files" => File::all()
         ]);
- 
     }
+ 
 
     /**
      * Show the form for creating a new resource.
@@ -25,90 +26,67 @@ class FileController extends Controller
     {
         return view("files.create");
     }
+ 
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        // Validar fitxer
         $validatedData = $request->validate([
             'upload' => 'required|mimes:gif,jpeg,jpg,png|max:1024'
         ]);
        
-        // Obtenir dades del fitxer
         $upload = $request->file('upload');
         $fileName = $upload->getClientOriginalName();
         $fileSize = $upload->getSize();
         \Log::debug("Storing file '{$fileName}' ($fileSize)...");
  
- 
-        // Pujar fitxer al disc dur
         $uploadName = time() . '_' . $fileName;
         $filePath = $upload->storeAs(
-            'uploads',      // Path
-            $uploadName ,   // Filename
-            'public'        // Disk
+            'uploads',      
+            $uploadName , 
+            'public'
         );
        
         if (\Storage::disk('public')->exists($filePath)) {
             \Log::debug("Disk storage OK");
             $fullPath = \Storage::disk('public')->path($filePath);
             \Log::debug("File saved at {$fullPath}");
-            // Desar dades a BD
             $file = File::create([
                 'filepath' => $filePath,
                 'filesize' => $fileSize,
             ]);
             \Log::debug("DB storage OK");
-            // Patró PRG amb missatge d'èxit
             return redirect()->route('files.show', $file)
                 ->with('success', 'File successfully saved');
         } else {
             \Log::debug("Disk storage FAILS");
-            // Patró PRG amb missatge d'error
             return redirect()->route("files.create")
                 ->with('error', 'ERROR uploading file');
         }
- 
     }
+ 
 
     /**
      * Display the specified resource.
      */
     public function show(File $file)
     {
-        $files = File::find($file);
-
-        if (!$file) {
-            return redirect()->route('files.index')->with('error', 'File not found');
-        }
-
-        // Verificar si el archivo existe en el disco
-        $fileExists = Storage::exists($files->filepath);
-
+        $fileExists = Storage::disk('public')->exists($file->filepath);
         if (!$fileExists) {
-            return redirect()->route('files.index')->with('error', 'File not found on disk');
+            return redirect()->route('files.index')->with('error', 'Fitxer no trobat');
         }
-
-        return view('files.show', compact('file'));
+        return view('files.show', compact('file')); 
+    }
 
     /**
      * Show the form for editing the specified resource.
      */
-    }
     public function edit(File $file)
     {
+        return view('files.edit', compact('file'));
 
-            $file = File::find($file);
-        
-            if (!$file) {
-                return redirect()->route('files.index')->with('error', 'File not found');
-            }
-        
-            return view('files.edit', compact('file'));
-        
-        
     }
 
     /**
@@ -116,49 +94,42 @@ class FileController extends Controller
      */
     public function update(Request $request, File $file)
     {
-        $files = File::find($file);
-
-        if (!$files) {
-            return redirect()->route('files.index')->with('error', 'File not found');
-        }
-    
+        // Validar los datos del formulario
         $request->validate([
-            'upload' => 'image|mimes:jpeg,png,gif|max:2048', // Validación del archivo (opcional)
+            'upload' => 'mimes:gif,jpeg,jpg,png|max:1024', // Ajusta las reglas según tus necesidades
         ]);
     
+        // Comprueba si se ha enviado un nuevo archivo
         if ($request->hasFile('upload')) {
-            // Actualizar archivo en el disco
-            $path = $request->file('upload')->store('public/uploads');
-            $files->filepath = $path;
+            // Elimina el archivo anterior del disco
+            Storage::disk('public')->delete($file->filepath);
+    
+            // Sube el nuevo archivo al disco
+            $newFile = $request->file('upload');
+            $newFileName = time() . '_' . $newFile->getClientOriginalName();
+            $newFilePath = $newFile->storeAs('uploads', $newFileName, 'public');
+    
+            // Actualiza la información del archivo en la base de datos
+            $file->update([
+                'original_name' => $newFile->getClientOriginalName(),
+                'filesize' => $newFile->getSize(),
+                'filepath' => $newFilePath,
+            ]);
         }
-    
-        // Actualizar otros campos del archivo
-        $file->name = $request->input('name');
-        $file->description = $request->input('description');
-    
-        $file->save();
-    
-        return redirect()->route('files.show', $file->id)->with('success', 'File updated successfully');
+        return redirect()->route('files.show', $file)->with('success', 'Archivo actualizado con éxito');
     }
-    
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(File $file)
     {
-        $files = File::find($file);
-
-        if (!$files) {
-            return redirect()->route('files.index')->with('error', 'File not found');
-        }
+        // Eliminar el archivo del disco
+        Storage::disk('public')->delete($file->filepath);
     
-        // Eliminar archivo del disco
-        Storage::delete($file->filepath);
+        // Eliminar el registro de la base de datos
+        $file->delete();
     
-        // Eliminar registro de la base de datos
-        $files->delete();
-    
-        return redirect()->route('files.index')->with('success', 'File deleted successfully');
+        return redirect()->route('files.index')->with('success', 'Archivo eliminado con éxito');
     }
 }
