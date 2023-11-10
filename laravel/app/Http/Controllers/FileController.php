@@ -13,6 +13,7 @@ class FileController extends Controller
      */
     public function index()
     {
+        
         return view("files.index", [
             "files" => File::all()
         ]);
@@ -85,7 +86,7 @@ class FileController extends Controller
      */
     public function edit(File $file)
     {
-        return view('files.edit', compact('file'));
+        return view('files.edit', compact('files'));
 
     }
 

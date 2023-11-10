@@ -1,4 +1,4 @@
-<x-app-layout>
+<!-- <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl leading-tight">
             {{ __('Places') }}
@@ -31,5 +31,25 @@
             {{ $places->links() }}
         </div>
     </div>
-</x-app-layout>
+</x-app-layout> -->
 
+<div>
+    <h2>Places</h2>
+
+    <div>
+        @foreach ($places as $place)
+        <div>
+            <p>ID: {{ $place->id }}</p>
+            <p>Filepath: {{ $place->file->filepath }}</p>
+            <p>Filesize: {{ $place->file->filesize }}</p>
+            <p>Created: {{ $place->created_at }}</p>
+            <p>Updated: {{ $place->updated_at }}</p>
+            <a href="{{ route('places.show', $place->id) }}">Show</a>
+        </div>
+        @endforeach
+
+        <hr>
+
+        <a href="{{ route('places.create') }}" role="button">Add Image</a>
+    </div>
+</div>

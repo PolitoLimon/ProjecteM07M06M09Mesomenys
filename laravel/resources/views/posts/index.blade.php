@@ -2,19 +2,19 @@
     <h2>Files</h2>
 
     <div>
-        @foreach ($files as $file)
+        @foreach ($posts as $post)
         <div>
-            <p>ID: {{ $file->id }}</p>
-            <p>Filepath: {{ $file->filepath }}</p>
-            <p>Filesize: {{ $file->filesize }}</p>
-            <p>Created: {{ $file->created_at }}</p>
-            <p>Updated: {{ $file->updated_at }}</p>
-            <a href="{{ route('files.show', $file->id) }}">Show</a>
+            <p>ID: {{ $post->id }}</p>
+            <p>Filepath: {{ $post->file->filepath }}</p>
+            <p>Filesize: {{ $post->file->filesize }}</p>
+            <p>Created: {{ $post->created_at }}</p>
+            <p>Updated: {{ $post->updated_at }}</p>
+            <a href="{{ route('posts.show', $post->id) }}">Show</a>
         </div>
         @endforeach
 
         <hr>
 
-        <a href="{{ route('files.create') }}" role="button">Add Image</a>
+        <a href="{{ route('posts.create') }}" role="button">Add Image</a>
     </div>
 </div>

@@ -152,10 +152,10 @@ class PlaceController extends Controller
         return redirect()->route('places.index')->with('success', 'Archivo eliminado con éxito');
     }
 
-    public function search(Request $request)
-    {
-        $searchTerm = $request->input('search');
-        $places = Place::where('title', 'like', '%', $searchTerm . '%')->paginate(5);
-        return view('places.index', ['places' => $places]);
-    }
+//     public function search(Request $request)
+//     {
+//         $searchTerm = $request->input('search');
+//         $places = Place::where('title', 'like', '%', $searchTerm . '%')->paginate(5);
+//         return view('places.index', ['places' => $places]);
+//     }
 }
