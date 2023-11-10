@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->integer('author_id');
-            $table->integer('file_id');
-            $table->string('title', 20);
-            $table->string('description', 200);
+            $table->string('body', 255);
+            $table->unsignedBigInteger('file_id');
+            $table->foreign('file_id')->references('id')->on('files');
+            $table->float('latitude', 8, 2);
+            $table->float('longitude', 8, 2);
+            $table->unsignedBigInteger('author_id');
+            $table->foreign('author_id')->references('id')->on('users');
             $table->timestamps();
-
-        });
+        });;
     }
 
     /**
