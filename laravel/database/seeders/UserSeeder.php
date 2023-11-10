@@ -11,11 +11,12 @@ class UserSeeder extends Seeder
 {
    public function run()
    {
-       $admin = new User([
-           'name'      => config('admin.name'),
-           'email'     => config('admin.email'),
-           'password'  => Hash::make(config('admin.password')),
-       ]);
+    User::create([
+        'name' => 'Admin User',
+        'email' => 'admin@example.com',
+        'password' => bcrypt('password'),
+        'role_id' => Role::where('name', 'admin')->first()->id, // Assigna el rol "admin"
+    ]);
         $admin->save();
    }
 }

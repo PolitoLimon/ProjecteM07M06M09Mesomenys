@@ -1,7 +1,12 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MailController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use App\Http\Controllers\FileController;
+use App\Http\Controllers\PlaceController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -13,8 +18,11 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
- 
-Route::get('/', function () {
+
+Route::get('/', function (Request $request) {
+    $message = 'Loading welcome page';
+    Log::info($message);
+    $request->session()->flash('info', $message);
     return view('welcome');
 });
 
@@ -28,27 +36,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-#------Ruta Request
-
-use Illuminate\Http\Request;
-// ...
-Route::get('/dashboard', function (Request $request) {
-    $request->session()->flash('info', 'TEST flash messages');
-    return view('dashboard');
- })->middleware(['auth','verified'])->name('dashboard');;
-
-
-
-
-#-------------Ruta MailController
-use App\Http\Controllers\MailController;
-// ...
 Route::get('mail/test', [MailController::class, 'test']);
 
-// or
-// Route::get('mail/test', 'App\Http\Controllers\MailController@test');
+Route::resource('files', FileController::class)
+    ->middleware(['auth', 'role.any:2']);
 
+Route::resource('posts', PostController::class)
+    ->middleware(['auth', 'role.any:1']);
 
+Route::get('search', 'App\Http\Controllers\PostController@search')->name('search');
 
 
 require __DIR__.'/auth.php';
