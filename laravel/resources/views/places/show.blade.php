@@ -1,29 +1,62 @@
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-       </ul>
-    </div>
-@endif
+@extends('layouts.box-app')
 
-<x-app-layout>
-    <div class="bg-white p-8 rounded shadow-md">
-        <h1 class="text-2xl font-semibold mb-4">Detalles del Lugar</h1>
-        <p class="text-lg font-semibold mb-2">Titulo: {{ $place->title }}</p>
-        <p class="text-gray-600 mb-4">Coordenadas: {{ $place->coordenadas }}</p>
-        <p class="text-gray-600 mb-4">Descripción: {{ $place->descripcion }}</p>
-        <img src="{{ asset('storage/' . $place->file->filepath) }}" alt="Image" class="w-50 h-50 mb-4" />
+@section('box-title')
+    {{ __('Place') . " " . $place->id }}
+@endsection
 
-        <x-button-link :href="route('places.edit', $place->id)" class="bg-blue-500 hover:bg-blue-600 text-white mr-2">Editar</x-button-link>
-        
-        <form action="{{ route('places.destroy', $place->id) }}" method="POST" class="inline-block">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded mr-2">Eliminar</button>
-        </form>
-        
-        <x-button-link :href="route('places.index')" class="bg-gray-300 hover:bg-gray-400 text-gray-700">Volver</x-button-link>
-    </div>
-</x-app-layout>
+@section('box-content')
+<x-columns columns=2>
+    @section('column-1')
+        <img class="w-full" src="{{ asset('storage/'.$file->filepath) }}" title="Image preview"/>
+    @endsection
+    @section('column-2')
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td><strong>ID<strong></td>
+                    <td>{{ $place->id }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Name</strong></td>
+                    <td>{{ $place->name }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Description</strong></td>
+                    <td>{{ $place->description }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Lat</strong></td>
+                    <td>{{ $place->latitude }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Lng</strong></td>
+                    <td>{{ $place->longitude }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Author</strong></td>
+                    <td>{{ $author->name }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Created</strong></td>
+                    <td>{{ $place->created_at }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Updated</strong></td>
+                    <td>{{ $place->updated_at }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="mt-8">
+            <x-primary-button href="{{ route('places.edit', $place) }}">
+                {{ __('Edit') }}
+            </x-danger-button>
+            <x-danger-button href="{{ route('places.delete', $place) }}">
+                {{ __('Delete') }}
+            </x-danger-button>
+            <x-secondary-button href="{{ route('places.index') }}">
+                {{ __('Back to list') }}
+            </x-secondary-button>
+        </div>
+    @endsection
+</x-columns>
+@endsection

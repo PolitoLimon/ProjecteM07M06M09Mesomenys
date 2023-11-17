@@ -1,41 +1,50 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Edit Places') }}
-        </h2>
-    </x-slot>
+@extends('layouts.box-app')
 
-    <div class="py-12 max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 text-gray-900 dark:text-gray-100">
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+@section('box-title')
+    {{ __('Place') . " " . $place->id }}
+@endsection
 
-            <form action="{{ route('places.update', $place->id) }}" method="POST" enctype="multipart/form-data" class="bg-white p-4 rounded-lg shadow-md">
-                @csrf
-                @method('PUT')
-
-                <x-input label="Titulo" name="title" value="{{ $place->title }}" />
-                <x-input label="Coordenadas" name="coordenadas" />
-                <x-textarea label="Descripcion" name="descripcion" rows="4">{{ $place->description }}</x-textarea>
-
-                <div class="mb-4">
-                    <label for="imagen" class="block text-gray-700 font-bold">Imagen actual:</label>
-                    <img src="{{ asset('storage/' . $place->file->filepath) }}" alt="Image" class="w-22 mb-4">
-                </div>
-
-                <x-input type="file" label="Selecciona un nuevo archivo" name="upload" class="border rounded w-full py-2 px-3 text-gray-700" />
-
-                <x-button type="submit" label="Guardar" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded" />
-            </form>
-
-            <a href="{{ route('places.index') }}" class="mt-4 inline-block text-gray-500 hover:text-gray-700">Volver</a>
-        </div>
-    </div>
-</x-app-layout>
+@section('box-content')
+<x-columns columns=2>
+    @section('column-1')
+        <img class="w-full" src="{{ asset('storage/'.$file->filepath) }}" title="Image preview"/>
+    @endsection
+    @section('column-2')
+        <form method="POST" action="{{ route('places.update', $place) }}" enctype="multipart/form-data">
+            @csrf
+            @method("PUT")
+            <div>
+                <x-input-label for="name" :value="__('Name')" />
+                <x-text-input type="text" name="name" id="name" class="block mt-1 w-full" :value="$place->name" />
+            </div>
+            <div>
+                <x-input-label for="description" :value="__('Description')" />
+                <x-textarea name="description" id="description" class="block mt-1 w-full" :value="$place->description" />
+            </div>
+            <div>
+                <x-input-label for="upload" :value="__('Upload')" />
+                <x-text-input type="file" name="upload" id="upload" class="block mt-1 w-full" />
+            </div>
+            <div>
+                <x-input-label for="latitude" :value="__('Latitude')" />
+                <x-text-input type="text" name="latitude" id="latitude" class="block mt-1 w-full" :value="$place->latitude" />
+            </div>
+            <div>
+                <x-input-label for="longitude" :value="__('Longitude')" />
+                <x-text-input type="text" name="longitude" id="longitude" class="block mt-1 w-full" :value="$place->longitude" />
+            </div>
+            <div class="mt-8">
+                <x-primary-button>
+                    {{ __('Update') }}
+                </x-primary-button>
+                <x-secondary-button type="reset">
+                    {{ __('Reset') }}
+                </x-secondary-button>
+                <x-secondary-button href="{{ route('places.index') }}">
+                    {{ __('Back to list') }}
+                </x-secondary-button>
+            </div>
+        </form>
+    @endsection
+</x-columns>
+@endsection

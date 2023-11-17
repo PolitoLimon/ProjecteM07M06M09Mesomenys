@@ -1,25 +1,42 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Create Place') }}
-        </h2>
-    </x-slot>
+@extends('layouts.box-app')
 
-    <div class="py-12 max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 text-gray-900 dark:text-gray-100">
-            <h1>Create Place</h1>
-            <form method="POST" action="{{ route('places.store') }}" enctype="multipart/form-data" class="bg-white p-4 rounded-lg shadow-md">
-                @csrf
-                <x-input-field label="Titulo" name="title" class="w-full p-2 border rounded-md" />
-                <x-input-field label="Coordenadas" name="coordenadas" class="w-full p-2 border rounded-md" />
-                <x-textarea-field label="Descripcion" name="descripcion" class="w-full p-2 border rounded-md" rows="4" />
-                <x-input-field type="file" label="Imagen" name="upload" class="w-full p-2 border rounded-md" />
-                <div class="flex space-x-4">
-                    <x-submit-button label="Crear" class="bg-blue-500 hover:bg-blue-600" />
-                    <x-reset-button label="Limpiar" class="bg-gray-300 hover:bg-gray-400" />
-                    <a href="{{ route('places.index') }}">Volver</a>
-                </div>
-            </form>
+@section('box-title')
+    {{ __('Add place') }}
+@endsection
+
+@section('box-content')
+    <form method="POST" action="{{ route('places.store') }}" enctype="multipart/form-data">
+        @csrf
+        <div>
+            <x-input-label for="name" :value="__('Name')" />
+            <x-text-input type="text" name="name" id="name" class="block mt-1 w-full" :value="old('name')" />
         </div>
-    </div>
-</x-app-layout>
+        <div>
+            <x-input-label for="description" :value="__('Description')" />
+            <x-textarea name="description" id="description" class="block mt-1 w-full" :value="old('description')" />
+        </div>
+        <div>
+            <x-input-label for="upload" :value="__('Upload')" />
+            <x-text-input type="file" name="upload" id="upload" class="block mt-1 w-full" :value="old('upload')" />
+        </div>
+        <div>
+            <x-input-label for="latitude" :value="__('Latitude')" />
+            <x-text-input type="text" name="latitude" id="latitude" class="block mt-1 w-full" value="41.2310371" />
+        </div>
+        <div>
+            <x-input-label for="longitude" :value="__('Longitude')" />
+            <x-text-input type="text" name="longitude" id="longitude" class="block mt-1 w-full" value="1.7282036" />
+        </div>
+        <div class="mt-8">
+            <x-primary-button>
+                {{ __('Create') }}
+            </x-primary-button>
+            <x-secondary-button type="reset">
+                {{ __('Reset') }}
+            </x-secondary-button>
+            <x-secondary-button href="{{ route('places.index') }}">
+                {{ __('Back to list') }}
+            </x-secondary-button>
+        </div>
+    </form>
+@endsection
