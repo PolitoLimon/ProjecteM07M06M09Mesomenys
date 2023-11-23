@@ -8,13 +8,14 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('places', function (Blueprint $table) {
+        Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->string('name',255);
-            $table->string('description',255);
+            $table->string('body', 255); 
             $table->unsignedBigInteger('file_id');
             $table->foreign('file_id')->references('id')->on('files');
             $table->float('latitude', 8, 5);  // 90  to -90
@@ -27,9 +28,11 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('places');
+        Schema::dropIfExists('posts');
     }
 };

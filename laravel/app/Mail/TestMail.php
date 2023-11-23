@@ -15,30 +15,13 @@ class TestMail extends Mailable
 
     /**
      * Create a new message instance.
+     * 
+     * @param array $content
      */
-    // public function __construct()
-    // {
-    //     //
-    // }
     public function __construct(array $content)
     {
         $this->content = $content;
     }
-
-        /**
-     * Get the message content definition.
-     */
-    public function content()
-    {
-        return new Content(
-            markdown: 'mails.testmail',
-            with: [
-                'content' => $this->content,
-            ],
-        );
-    }
- 
-
 
     /**
      * Get the message envelope.
@@ -53,12 +36,15 @@ class TestMail extends Mailable
     /**
      * Get the message content definition.
      */
-    // public function content(): Content
-    // {
-    //     return new Content(
-    //         markdown: 'mails.testmail',
-    //     );
-    // }
+    public function content(): Content
+    {
+        return new Content(
+            markdown: 'mails.testmail',
+            with: [
+                'content' => $this->content,
+            ],
+        );
+    }
 
     /**
      * Get the attachments for the message.

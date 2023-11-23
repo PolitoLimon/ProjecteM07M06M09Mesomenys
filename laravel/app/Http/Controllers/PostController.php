@@ -3,161 +3,196 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use Illuminate\Http\Request;
 use App\Models\File;
-use App\Models\User;
-use App\Http\Controllers\FileController;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller
 {
+    private bool $_pagination = true;
+
     /**
      * Display a listing of the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $collectionQuery = Post::orderBy('created_at', 'desc');
+
+        // Filter?
+        if ($search = $request->get('search')) {
+            $collectionQuery->where('body', 'like', "%{$search}%");
+        }
+        
+        // Pagination
+        $posts = $this->_pagination 
+            ? $collectionQuery->paginate(5)->withQueryString() 
+            : $collectionQuery->get();
+        
         return view("posts.index", [
-            "posts" => Post::paginate(5),
-            // "files" => File::all(),
-            // "users" => User::all(),
+            "posts" => $posts,
+            "search" => $search
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
      */
     public function create()
-    {
-        //
-        return view("posts.create");
+    { 
+        return view("posts.create");  
     }
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        //
+        // Validar dades del formulari
         $validatedData = $request->validate([
-            'upload' => 'required|mimes:gif,jpeg,jpg,png|max:1024',
-            'title' => 'required|max:20',
-            'description' => 'required|max:200'
+            'body'      => 'required',
+            'upload'    => 'required|mimes:gif,jpeg,jpg,png,mp4|max:2048',
+            'latitude'  => 'required',
+            'longitude' => 'required',
         ]);
-       
-        $upload = $request->file('upload');
-        $fileName = $upload->getClientOriginalName();
-        $fileSize = $upload->getSize();
-        \Log::debug("Storing file '{$fileName}' ($fileSize)...");
- 
-        $uploadName = time() . '_' . $fileName;
-        $filePath = $upload->storeAs(
-            'uploads',      
-            $uploadName , 
-            'public'
-        );
-        if (\Storage::disk('public')->exists($filePath)) {
-            \Log::debug("Disk storage OK");
-            $fullPath = \Storage::disk('public')->path($filePath);
-            \Log::debug("File saved at {$fullPath}");
-            $file = File::create([
-                'filepath' => $filePath,
-                'filesize' => $fileSize,
-            ]);
-            \Log::debug("DB storage OK");
+        
+        // Obtenir dades del formulari
+        $body          = $request->get('body');
+        $upload        = $request->file('upload');
+        $latitude      = $request->get('latitude');
+        $longitude     = $request->get('longitude');
+
+        // Desar fitxer al disc i inserir dades a BD
+        $file = new File();
+        $fileOk = $file->diskSave($upload);
+
+        if ($fileOk) {
+            // Desar dades a BD
+            Log::debug("Saving post at DB...");
             $post = Post::create([
-                'author_id' => $user = auth()->user()->id,
-                'file_id' => $file->id,
-                'title' => $request->title,
-                'description' => $request->description,
+                'body'      => $body,
+                'file_id'   => $file->id,
+                'latitude'  => $latitude,
+                'longitude' => $longitude,
+                'author_id' => auth()->user()->id,
             ]);
+            Log::debug("DB storage OK");
+            // Patró PRG amb missatge d'èxit
             return redirect()->route('posts.show', $post)
-                ->with('success', 'File successfully saved');
+                ->with('success', __('Post successfully saved'));
         } else {
-            \Log::debug("Disk storage FAILS");
+            // Patró PRG amb missatge d'error
             return redirect()->route("posts.create")
-                ->with('error', 'ERROR uploading file');
+                ->with('error', __('ERROR Uploading file'));
         }
     }
 
     /**
      * Display the specified resource.
+     *
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\Response
      */
     public function show(Post $post)
     {
-        //
-        $fileExists = Storage::disk('public')->exists($post->file->filepath);
-        if (!$fileExists) {
-            return redirect()->route('posts.index')->with('error', 'Fitxer no trobat');
-        }
-        if (!$post->id){
-            return redirect()->route('posts.index')->with('error', 'Post no trobat');
-        }
-        return view('posts.show', compact('post'));
+        return view("posts.show", [
+            'post'   => $post,
+            'file'   => $post->file,
+            'author' => $post->user,
+        ]);
     }
 
     /**
      * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\Response
      */
     public function edit(Post $post)
     {
-        //
-        return view('posts.edit', compact('post'));
+        return view("posts.edit", [
+            'post'   => $post,
+            'file'   => $post->file,
+            'author' => $post->user,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Post $post)
     {
-        //
-        // Validar los datos del formulario
-        $request->validate([
-            'upload' => 'mimes:gif,jpeg,jpg,png|max:1024',
-            'title' => 'required|max:20',
-            'description' => 'required|max:200'
+        // Validar dades del formulari
+        $validatedData = $request->validate([
+            'body'      => 'required',
+            'upload'    => 'nullable|mimes:gif,jpeg,jpg,png,mp4|max:2048',
+            'latitude'  => 'required',
+            'longitude' => 'required',
         ]);
 
-        if ($request->hasFile('upload')) {
-            // Elimina el archivo anterior del disco
-            Storage::disk('public')->delete($post->file->filepath);
-    
-            // Sube el nuevo archivo al disco
-            $newFile = $request->file('upload');
-            $newFileName = time() . '_' . $newFile->getClientOriginalName();
-            $newFilePath = $newFile->storeAs('uploads', $newFileName, 'public');
-            // Actualiza la información del archivo en la base de datos
-            // dd($post->file);
-            $post->file->update([
-                'original_name' => $newFile->getClientOriginalName(),
-                'filesize' => $newFile->getSize(),
-                'filepath' => $newFilePath,
-            ]);
+        // Obtenir dades del formulari
+        $body      = $request->get('body');
+        $upload    = $request->file('upload');
+        $latitude  = $request->get('latitude');
+        $longitude = $request->get('longitude');
+
+        // Desar fitxer (opcional)
+        if (is_null($upload) || $post->file->diskSave($upload)) {
+            // Actualitzar dades a BD
+            Log::debug("Updating DB...");
+            $post->body      = $body;
+            $post->latitude  = $latitude;
+            $post->longitude = $longitude;
+            $post->save();
+            Log::debug("DB storage OK");
+            // Patró PRG amb missatge d'èxit
+            return redirect()->route('posts.show', $post)
+                ->with('success', __('Post successfully saved'));
+        } else {
+            // Patró PRG amb missatge d'error
+            return redirect()->route("posts.edit")
+                ->with('error', __('ERROR Uploading file'));
         }
-        $post->update([
-            'author_id' => $user = auth()->user()->id,
-            'file_id' => $post->file->id,
-            'title' => $request->title,
-            'description' => $request->description,
-        ]);
-        return redirect()->route('posts.show', $post)->with('success', 'Archivo actualizado con éxito');
     }
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\Response
      */
     public function destroy(Post $post)
     {
-        Storage::disk('public')->delete($post->file->filepath);
+        // Eliminar post de BD
         $post->delete();
-        $post->file->delete();
-        return redirect()->route('posts.index')->with('success', 'Archivo eliminado con éxito');
+        // Eliminar fitxer associat del disc i BD
+        $post->file->diskDelete();
+        // Patró PRG amb missatge d'èxit
+        return redirect()->route("posts.index")
+            ->with('success', __('Post successfully deleted'));
     }
 
-    public function search(Request $request)
+    /**
+     * Confirm specified resource deletion from storage.
+     *
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\Response
+     */
+    public function delete(Post $post)
     {
-        $searchTerm = $request->input('search');
-        $posts = Post::where('title', 'like', '%' . $searchTerm . '%')->paginate(5);
-        return view('posts.index', ['posts' => $posts]);
+        return view("posts.delete", [
+            'post' => $post
+        ]);
     }
 }

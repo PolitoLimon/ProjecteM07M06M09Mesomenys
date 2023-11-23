@@ -1,20 +1,37 @@
-<div>
-    <h2>Files</h2>
+@extends('layouts.box-app')
 
-    <div>
-        @foreach ($posts as $post)
-        <div>
-            <p>ID: {{ $post->id }}</p>
-            <p>Filepath: {{ $post->file->filepath }}</p>
-            <p>Filesize: {{ $post->file->filesize }}</p>
-            <p>Created: {{ $post->created_at }}</p>
-            <p>Updated: {{ $post->updated_at }}</p>
-            <a href="{{ route('posts.show', $post->id) }}">Show</a>
-        </div>
-        @endforeach
+@section('box-title')
+    {{ __('Posts') }}
+@endsection
 
-        <hr>
+@php
+    $cols = [
+        "id",
+        "body",
+        "file_id",
+        "latitude",
+        "longitude",
+        "created_at",
+        "updated_at"
+    ];
+@endphp
 
-        <a href="{{ route('posts.create') }}" role="button">Add Image</a>
+@section('box-content')
+    <!-- Results -->
+    <x-table-index :cols=$cols :rows=$posts 
+        :enableActions=true parentRoute='posts' 
+        :enableSearch=true :search=$search />
+    <!-- Pagination -->
+    <div class="mt-8">
+        {{ $posts->links() }}
     </div>
-</div>
+    <!-- Buttons -->
+    <div class="mt-8">
+        <x-primary-button href="{{ route('posts.create') }}">
+            {{ __('Add new post') }}
+        </x-primary-button>
+        <x-secondary-button href="{{ route('dashboard') }}">
+            {{ __('Back to dashboard') }}
+        </x-secondary-button>
+    </div>
+@endsection

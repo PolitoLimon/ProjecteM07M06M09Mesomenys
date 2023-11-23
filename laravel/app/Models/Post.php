@@ -9,21 +9,21 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['author_id', 'file_id', 'title', 'description'];
+    protected $fillable = [
+        'body',
+        'file_id',
+        'latitude',
+        'longitude',
+        'author_id'
+    ];
 
     public function file()
     {
-        return $this->belongsTo(File::class);
+       return $this->belongsTo(File::class);
     }
 
     public function user()
     {
         return $this->belongsTo(User::class, 'author_id');
     }
-
-    public function author()
-    {
-        return $this->belongsTo(User::class);
-    }
-
 }

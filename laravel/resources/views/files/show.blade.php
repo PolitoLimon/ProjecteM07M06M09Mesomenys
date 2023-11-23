@@ -1,34 +1,60 @@
-@if ($errors->any())
-    <div>
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-       </ul>
-    </div>
-@endif
+@extends('layouts.box-app')
 
-<div>
-    <h1>Detalles del Archivo</h1>
-    <div>
-        <strong>Tamaño del Archivo:</strong> {{ $file->filesize }} bytes
-    </div>
-    <div>
-        <strong>Fecha de Subida:</strong> {{ $file->created_at }}
-    </div>
-    <hr>
+@section('box-title')
+    {{ __('File') . " " . $file->id }}
+@endsection
 
-    <img src="{{ asset("storage/{$file->filepath}") }}" alt="File Image" />
+@php
+    $cols = [
+        "id",
+        "filepath",
+        "filesize",
+        "created_at",
+        "updated_at"
+    ];
+@endphp
 
-    <hr>
-
-    <a href="{{ route('files.edit', $file->id) }}">Editar</a>
-
-    <form action="{{ route('files.destroy', $file->id) }}" method="POST" style="display: inline;">
-        @csrf
-        @method('DELETE')
-        <button type="submit">Eliminar</button>
-    </form>
-
-    <a href="{{ route('files.index') }}">Volver al Listado</a>
-</div>
+@section('box-content')
+<x-columns columns=2>
+    @section('column-1')
+        <img class="w-full" src="{{ asset('storage/'.$file->filepath) }}" title="Image preview"/>
+    @endsection
+    @section('column-2')
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td><strong>ID<strong></td>
+                    <td>{{ $file->id }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Filepath</strong></td>
+                    <td>{{ $file->filepath }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Filesize</strong></td>
+                    <td>{{ $file->filesize }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Created</strong></td>
+                    <td>{{ $file->created_at }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Updated</strong></td>
+                    <td>{{ $file->updated_at }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="mt-8">
+            <x-primary-button href="{{ route('files.edit', $file) }}">
+                {{ __('Edit') }}
+            </x-danger-button>
+            <x-danger-button href="{{ route('files.delete', $file) }}">
+                {{ __('Delete') }}
+            </x-danger-button>
+            <x-secondary-button href="{{ route('files.index') }}">
+                {{ __('Back to list') }}
+            </x-secondary-button>
+        </div>
+    @endsection
+</x-columns>
+@endsection

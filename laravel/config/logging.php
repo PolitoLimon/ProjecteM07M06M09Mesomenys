@@ -57,7 +57,6 @@ return [
             'channels' => ['single', 'errorlog'],
             'ignore_exceptions' => false,
         ],
- 
 
         'single' => [
             'driver' => 'single',

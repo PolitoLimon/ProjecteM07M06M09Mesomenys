@@ -1,20 +1,28 @@
-<div>
-    <h2>Files</h2>
+@extends('layouts.box-app')
 
-    <div>
-        @foreach ($files as $file)
-        <div>
-            <p>ID: {{ $file->id }}</p>
-            <p>Filepath: {{ $file->filepath }}</p>
-            <p>Filesize: {{ $file->filesize }}</p>
-            <p>Created: {{ $file->created_at }}</p>
-            <p>Updated: {{ $file->updated_at }}</p>
-            <a href="{{ route('files.show', $file->id) }}">Show</a>
-        </div>
-        @endforeach
+@section('box-title')
+    {{ __('Files') }}
+@endsection
 
-        <hr>
+@php
+    $cols = [
+        "id",
+        "filepath",
+        "filesize",
+        "created_at",
+        "updated_at"
+    ];
+@endphp
 
-        <a href="{{ route('files.create') }}" role="button">Add Image</a>
+@section('box-content')
+    <x-table-index :cols=$cols :rows=$files 
+        :enableActions=true parentRoute='files' />
+    <div class="mt-8">
+        <x-primary-button href="{{ route('files.create') }}">
+            {{ __('Add new file') }}
+        </x-primary-button>
+        <x-secondary-button href="{{ route('dashboard') }}">
+            {{ __('Back to dashboard') }}
+        </x-secondary-button>
     </div>
-</div>
+@endsection

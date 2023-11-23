@@ -8,12 +8,14 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('files', function (Blueprint $table) {
             $table->id();
-            $table->string('filepath');
+            $table->string('filepath', 255);
             $table->integer('filesize');
             $table->timestamps();
         });
@@ -21,8 +23,10 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('files');
     }
