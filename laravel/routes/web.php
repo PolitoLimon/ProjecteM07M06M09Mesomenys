@@ -1,16 +1,14 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Http\Request;
-
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MailController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use App\Http\Controllers\FileController;
-use App\Http\Controllers\PostController;
 use App\Http\Controllers\PlaceController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\HomeController;
 
-use App\Models\Role;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,13 +21,14 @@ use App\Models\Role;
 |
 */
 
-Route::get('/', function () {
-    Log::info('Loading welcome page');
+Route::get('/', function (Request $request) {
+    $message = 'Loading welcome page';
+    Log::info($message);
+    $request->session()->flash('info', $message);
     return view('welcome');
 });
 
-Route::get('/dashboard', function (Request $request) {
-    $request->session()->flash('info', 'TEST flash messages');
+Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -39,32 +38,26 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
-
-// Mail
-
 Route::get('mail/test', [MailController::class, 'test']);
-
-// Files
 
 Route::resource('files', FileController::class)
     ->middleware(['auth']);
 
-Route::get('files/{file}/delete', [FileController::class, 'delete'])->name('files.delete')
-    ->middleware(['auth']);
+Route::resource('places', PlaceController::class)
+    ->middleware(['auth' ]);
 
-// Posts
+Route::get('places.search', 'App\Http\Controllers\PlaceController@search')->name('places.search');
 
 Route::resource('posts', PostController::class)
     ->middleware(['auth']);
 
-Route::get('posts/{post}/delete', [PostController::class, 'delete'])->name('posts.delete')
-    ->middleware(['auth']);
+Route::get('posts.search', 'App\Http\Controllers\PostController@search')->name('posts.search');
 
-// Places
 
-Route::resource('places', PlaceController::class)
-    ->middleware(['auth']);
 
-Route::get('places/{place}/delete', [PlaceController::class, 'delete'])->name('places.delete')
-    ->middleware(['auth']);
+#######-------Ruta /home----------------#######3
+
+Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+
+require __DIR__.'/auth.php';
