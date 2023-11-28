@@ -202,4 +202,17 @@ class PlaceController extends Controller
             'place' => $place
         ]);
     }
+    public function favorite(Place $place)
+    {
+        auth()->user()->favorites()->attach($place);
+
+        return redirect()->back();
+    }
+
+    public function unfavorite(Place $place)
+    {
+        auth()->user()->favorites()->detach($place);
+
+        return redirect()->back();
+    }
 }

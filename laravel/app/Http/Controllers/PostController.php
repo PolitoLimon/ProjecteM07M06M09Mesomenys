@@ -195,4 +195,18 @@ class PostController extends Controller
             'post' => $post
         ]);
     }
+    public function like(Post $post)
+    {
+        auth()->user()->likes()->attach($post);
+
+        return redirect()->back();
+    }
+
+    public function unlike(Post $post)
+    {
+        auth()->user()->likes()->detach($post);
+
+        return redirect()->back();
+    }
+
 }

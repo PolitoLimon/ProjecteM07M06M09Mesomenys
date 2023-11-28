@@ -48,8 +48,14 @@ Route::resource('places', PlaceController::class)
 
 Route::get('places.search', 'App\Http\Controllers\PlaceController@search')->name('places.search');
 
+Route::post('/places/{place}/favs', 'PlaceController@favorite')->name('places.favorite');
+Route::delete('/places/{place}/favs', 'PlaceController@unfavorite')->name('places.unfavorite');
+
 Route::resource('posts', PostController::class)
     ->middleware(['auth']);
+
+Route::post('/posts/{post}/likes', 'PostController@like')->name('posts.like');
+Route::delete('/posts/{post}/likes', 'PostController@unlike')->name('posts.unlike');
 
 Route::get('posts.search', 'App\Http\Controllers\PostController@search')->name('posts.search');
 
