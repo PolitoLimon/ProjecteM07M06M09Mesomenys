@@ -1,10 +1,10 @@
 <x-geomir-layout>
    <div>
-      <header>
+      <nav>
          <div>
             <h1>Home</h1>
          </div>
-      </header>
+</nav>
       <main>
          <p>Lorem itsum</p>
       </main>
