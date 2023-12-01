@@ -11,7 +11,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasName;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -54,32 +54,29 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Place::class, 'favorites');
     }
-}
 
-class User extends Authenticatable implements FilamentUser
-{
-    // ...
+
  
     public function canAccessFilament(): bool
     {
-        return str_ends_with($this->email, '@yourdomain.com') && $this->hasVerifiedEmail();
+        return true;
     }
-}
-class User extends Authenticatable implements FilamentUser, HasAvatar
-{
-    // ...
- 
+
+
     public function getFilamentAvatarUrl(): ?string
     {
         return $this->avatar_url;
     }
-}
-class User extends Authenticatable implements FilamentUser, HasName
-{
-    // ...
+
+   
  
     public function getFilamentName(): string
     {
         return "{$this->first_name} {$this->last_name}";
     }
+    public function role()
+    {
+       return $this->belongsTo(Role::class);
+    }
+
 }
