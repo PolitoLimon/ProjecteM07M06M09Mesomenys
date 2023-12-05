@@ -5,7 +5,7 @@
 @endsection
 
 @section('box-content')
-    <form method="POST" action="{{ route('places.store') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('places.store') }}" enctype="multipart/form-data" onSubmit={handleSubmit}>
         @csrf
         <div>
             <x-input-label for="name" :value="__('Name')" />

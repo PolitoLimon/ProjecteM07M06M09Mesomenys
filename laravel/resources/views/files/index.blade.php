@@ -15,8 +15,7 @@
 @endphp
 
 @section('box-content')
-    <x-table-index :cols=$cols :rows=$files 
-        :enableActions=true parentRoute='files' />
+    <x-table-index :cols=$cols :rows=$files parentRoute='files' />
     <div class="mt-8">
         <x-primary-button href="{{ route('files.create') }}">
             {{ __('Add new file') }}
