@@ -198,15 +198,23 @@ class PostController extends Controller
     public function like(Post $post)
     {
         auth()->user()->likes()->attach($post);
-
+        $this->authorize('like', $post);
         return redirect()->back();
+       
     }
 
     public function unlike(Post $post)
     {
         auth()->user()->likes()->detach($post);
+        $this->authorize('unlike', $post);
 
         return redirect()->back();
     }
+    public function __construct()
+    {
+        $this->authorizeResource(Post::class, 'post');
+    }
+
+
 
 }

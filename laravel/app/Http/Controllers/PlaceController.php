@@ -205,6 +205,7 @@ class PlaceController extends Controller
     public function favorite(Place $place)
     {
         auth()->user()->favorites()->attach($place);
+        $this->authorize('favorite', $place);
 
         return redirect()->back();
     }
@@ -212,7 +213,13 @@ class PlaceController extends Controller
     public function unfavorite(Place $place)
     {
         auth()->user()->favorites()->detach($place);
+        $this->authorize('unfavorite', $place);
 
         return redirect()->back();
     }
+    public function __construct()
+    {
+        $this->authorizeResource(Place::class, 'place');
+    }
+
 }

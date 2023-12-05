@@ -17,3 +17,10 @@
         📍 {{ __('Places') }}
     </x-primary-button>
 @endsection
+@can('create', App\Models\Post::class)
+    <!-- Mostra el botó de crear post -->
+@endcan
+
+@can('create', App\Models\Place::class)
+    <!-- Mostra el botó de crear place -->
+@endcan

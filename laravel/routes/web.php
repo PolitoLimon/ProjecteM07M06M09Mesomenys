@@ -8,6 +8,8 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\LanguageController;
 
 
 /*
@@ -65,5 +67,17 @@ Route::get('posts.search', 'App\Http\Controllers\PostController@search')->name('
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+
+Route::post('/posts/{post}/like', 'PostController@like')->middleware('auth');
+Route::delete('/posts/{post}/unlike', 'PostController@unlike')->middleware('auth');
+
+
+Route::post('/places/{place}/favorite', 'PlaceController@favorite')->middleware('auth');
+Route::delete('/places/{place}/unfavorite', 'PlaceController@unfavorite')->middleware('auth');
+
+Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::resource('users', UserController::class);
+});
+Route::get('/language/{locale}', [LanguageController::class, 'language'])->name('language');
 
 require __DIR__.'/auth.php';

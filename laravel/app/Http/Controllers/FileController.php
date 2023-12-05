@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use App\Models\Post;
 
 class FileController extends Controller
 {
@@ -109,9 +111,11 @@ class FileController extends Controller
                 ->with('success', __('File successfully saved'));
         } else {
             // Patró PRG amb missatge d'error
-            return redirect()->route("files.edit")
+            return redirect()->route("files.create")
                 ->with('error', __('ERROR uploading file'));
         }
+ 
+ 
     }
 
     /**
@@ -140,5 +144,9 @@ class FileController extends Controller
         return view("files.delete", [
             'file' => $file
         ]);
+    }
+    public function __construct()
+    {
+        $this->authorizeResource(Post::class, 'post');
     }
 }

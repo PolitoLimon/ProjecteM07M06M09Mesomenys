@@ -97,6 +97,12 @@ return [
     */
 
     'fallback_locale' => 'en',
+    'available_locales' => [
+        'ca' => 'Català',
+        'es' => 'Castellano',
+        'en' => 'English',
+    ],
+ 
 
     /*
     |--------------------------------------------------------------------------
@@ -168,6 +174,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        Barryvdh\Debugbar\ServiceProvider::class,
     ])->toArray(),
 
     /*
@@ -182,7 +189,7 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        // 'Example' => App\Facades\Example::class,
+        'Debugbar' => Barryvdh\Debugbar\Facade::class,
     ])->toArray(),
 
 ];

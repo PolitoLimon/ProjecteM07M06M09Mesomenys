@@ -22,10 +22,12 @@
             <link rel="stylesheet" href="{{ asset('build/'.$manifest['resources/css/app.css']['file']) }}">
             <script type="module" src="{{ asset('build/'.$manifest['resources/js/app.js']['file']) }}"></script>
         @endenv
+        
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
             @include('layouts.navigation')
+           
 
             <!-- Page Heading -->
             @if (isset($header))
@@ -34,13 +36,17 @@
                         {{ $header }}
                     </div>
                 </header>
+                
             @endif
+
+
 
             <!-- Page Content -->
             <main>
                 @include('partials.flash')
                 {{ $slot }}
             </main>
+            <x-language-switcher />
         </div>
     </body>
 </html>
