@@ -8,6 +8,7 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AboutController;
 
 
 /*
@@ -59,5 +60,6 @@ Route::get('posts.search', 'App\Http\Controllers\PostController@search')->name('
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+Route::get('/about', [AboutController::class, 'index' ])->name('about');
 
 require __DIR__.'/auth.php';

@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
         <title>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Fonts -->
@@ -24,23 +24,25 @@
         @endenv
 
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-black-900 dark:bg-gray-500">
-            @include('layouts.navigation')
-
+    <body class="font-sans antialiased dark:bg-zinc-600">
+        <div class="min-h-screen bg-black-900 dark:bg-zinc-600">
             <!-- Page Heading -->
             @if (isset($header))
-                <header class="bg-gray dark:bg-gray-600">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
+                <header class="bg-gray dark:bg-zinc-800 m-1 p-10">
+                    {{ $header }}
                 </header>
             @endif
-
             <!-- Page Content -->
-            <main class="bg-gray dark:bg-gray-900">
+            <nav class="flex justify-between items-center ml-2 mr-2 mt-2 p-2"> 
+                {{ $nav }}
+            </nav>
+            <main class=" bg-gray dark:bg-white text-white m-2 pt-10 pb-10">
                 {{ $slot }}
             </main >
+
+            <footer class="bg-gray dark:bg-zinc-800 text-white m-1 pl-10 pr-10 pt-5 pb-5  items-end">
+                {{ $footer }}
+            </footer>
         </div>
     </body>
 </html>

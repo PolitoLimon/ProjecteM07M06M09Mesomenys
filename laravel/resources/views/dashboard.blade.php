@@ -16,4 +16,7 @@
     <x-primary-button href="{{ url('/places') }}">
         📍 {{ __('Places') }}
     </x-primary-button>
+    <x-primary-button href="{{ url('home') }}">
+        🏠 {{ __('Home') }}   
+    </x-primary-button>
 @endsection

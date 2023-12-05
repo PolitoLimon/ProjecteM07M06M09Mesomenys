@@ -8,4 +8,4 @@ Fitxers extra:
 * index.php: Redirigeix a laravel/public/index.php
 * laravel/.htaccess: Redirigeix TOTES les peticions al directori public
 
-# branca b0.2-pol creada
+# branca b0.2 creada
