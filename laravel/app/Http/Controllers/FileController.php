@@ -9,14 +9,6 @@ use Illuminate\Support\Facades\Log;
 class FileController extends Controller
 {
     /**
-     * Create the controller instance.
-     */
-    public function __construct()
-    {
-        $this->authorizeResource(File::class, 'file');
-    }
-    
-    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -59,9 +51,7 @@ class FileController extends Controller
         if ($ok) {
             // Patró PRG amb missatge d'èxit
             return redirect()->route('files.show', $file)
-                ->with('success', __(':resource successfully saved', [
-                    'resource' => __('File')
-                ]));
+                ->with('success', __('File successfully saved'));
         } else {
             // Patró PRG amb missatge d'error
             return redirect()->route("files.create")
@@ -116,9 +106,7 @@ class FileController extends Controller
         if ($ok) {
             // Patró PRG amb missatge d'èxit
             return redirect()->route('files.show', $file)
-                ->with('success', __(':resource successfully saved', [
-                    'resource' => __('File')
-                ]));
+                ->with('success', __('File successfully saved'));
         } else {
             // Patró PRG amb missatge d'error
             return redirect()->route("files.edit")
@@ -138,9 +126,7 @@ class FileController extends Controller
         $file->diskDelete();
         // Patró PRG amb missatge d'èxit
         return redirect()->route("files.index")
-            ->with('success', __(':resource successfully deleted', [
-                'resource' => __('File')
-            ]));
+            ->with('success', __("File succesfully deleted."));
     }
     
     /**
