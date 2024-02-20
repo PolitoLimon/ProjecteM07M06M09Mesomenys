@@ -13,7 +13,11 @@ class PostPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        // Verifica si el rol del usuario está en la lista de roles permitidos
+        if (in_array($user->role_id, [1, 2, 3])) {
+            return $user->role_id;
+        }
+        return false;
     }
 
     /**
@@ -21,7 +25,12 @@ class PostPolicy
      */
     public function view(User $user, Post $post): bool
     {
-        return true;
+        //
+        // Verifica si el rol del usuario está en la lista de roles permitidos
+        if (in_array($user->role_id, [1, 2, 3])) {
+            return $user->role_id;
+        }
+        return false;
     }
 
     /**
@@ -29,7 +38,8 @@ class PostPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isPublisher();
+        //
+        return $user->role_id === 1;
     }
 
     /**
@@ -37,7 +47,8 @@ class PostPolicy
      */
     public function update(User $user, Post $post): bool
     {
-        return $user->isPublisher() && $post->author_id === $user->id;
+        //
+        return $user->role_id === 1 && $user->id === $post->author_id;
     }
 
     /**
@@ -45,8 +56,20 @@ class PostPolicy
      */
     public function delete(User $user, Post $post): bool
     {
-        return ($user->isPublisher() && $post->author_id === $user->id)
-            || $user->isEditor();
+        //
+        if ($user->role_id === 1 && $user->id === $post->author_id) {
+            return $user->role_id;
+        } elseif ($user->role_id === 2) {
+            return true;
+        }
+        return false;
+
+        // return $user->role_id === 1 && $user->id === $post->author_id;
+    }
+    
+    public function like(User $user): bool
+    {
+        return $user->role_id == 1;
     }
 
     /**
@@ -63,21 +86,5 @@ class PostPolicy
     public function forceDelete(User $user, Post $post): bool
     {
         //
-    }
-
-    /**
-     * Determine whether the user can like the model.
-     */
-    public function like(User $user, Post $post): bool
-    {
-        return $user->isPublisher() && !$post->likedByUser($user);
-    }
-
-    /**
-     * Determine whether the user can unlike the model.
-     */
-    public function unlike(User $user, Post $post): bool
-    {
-        return $user->isPublisher() && $post->likedByUser($user);
     }
 }

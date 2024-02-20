@@ -9,54 +9,58 @@ class Place extends Model
 {
     use HasFactory;
     
+    /**
+     * 
+     * Los atributos que son asignables masivamente.
+     *
+     */
     protected $fillable = [
-        'name',
-        'description',
-        'file_id',
+        'title',
         'latitude',
         'longitude',
+        'descripcion',
+        'file_id',
         'author_id',
-        'visibility_id'
+        'visibility_id',
     ];
 
+    /**
+     * 
+     * Relación: Un lugar pertenece a un archivo.
+     *
+     */
     public function file()
     {
         return $this->belongsTo(File::class);
     }
 
+    /**
+     * 
+     * Relación: Un lugar pertenece a un usuario (autor).
+     *
+     */
     public function user()
     {
         return $this->belongsTo(User::class, 'author_id');
     }
 
-    public function author()
-    {
-        return $this->belongsTo(User::class);
-    }
-    
+    /**
+     * 
+     * Relación: Muchos usuarios pueden tener este lugar como favorito.
+     *
+     */
     public function favorited()
     {
         return $this->belongsToMany(User::class, 'favorites');
     }
     
-    public function favoritedByUser(User $user)
-    {
-        $count = Favorite::where([
-            ['user_id',  '=', $user->id],
-            ['place_id', '=', $this->id],
-        ])->count();
-
-        return $count > 0;
-    }
-
-    public function favoritedByAuthUser()
-    {
-        $user = auth()->user();
-        return $this->favoritedByUser($user);
-    }
-
     public function visibility()
     {
         return $this->belongsTo(Visibility::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }
