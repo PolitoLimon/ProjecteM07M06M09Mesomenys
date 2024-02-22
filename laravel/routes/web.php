@@ -1,17 +1,16 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Log;
+use App\Models\Place;
 use Illuminate\Http\Request;
-
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\MailController;
-use App\Http\Controllers\FileController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\FileController;
+use App\Http\Controllers\MailController;
 use App\Http\Controllers\PlaceController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LanguageController;
-
-use App\Models\Role;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\CommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,13 +23,15 @@ use App\Models\Role;
 |
 */
 
-Route::get('/', function () {
-    Log::info('Loading welcome page');
-    return view('welcome');
+Route::get('/', function (Request $request) {
+    $message = 'Loading welcome page';
+    Log::info($message);
+    $request->session()->flash('info', $message);
+    // return view('welcome');
+    return redirect('/dashboard');
 });
 
-Route::get('/dashboard', function (Request $request) {
-    $request->session()->flash('info', 'TEST flash messages');
+Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -40,56 +41,56 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
-
-// Mail
-
 Route::get('mail/test', [MailController::class, 'test']);
-
-// Files
-// NOTE: FilePolicy with authorizeResource helper
 
 Route::resource('files', FileController::class)
     ->middleware(['auth']);
 
-Route::get('files/{file}/delete', [FileController::class, 'delete'])->name('files.delete')
+Route::resource('places', PlaceController::class)
     ->middleware(['auth']);
-
-// Posts
-// NOTE: PostPolicy with authorizeResource and authorize helpers
 
 Route::resource('posts', PostController::class)
     ->middleware(['auth']);
 
-Route::controller(PostController::class)->group(function () {
-    Route::get('posts/{post}/delete', 'delete')
-        ->name('posts.delete');
-    Route::post('/posts/{post}/likes', 'like')
-        ->name('posts.like');
-    Route::delete('/posts/{post}/likes', 'unlike')
-        ->name('posts.unlike');
-});
 
-// Places
-// NOTE: PlacePolicy with authorizeResource helper and can middleware
+Route::get('places.search', 'App\Http\Controllers\PlaceController@search')->name('places.search');
+Route::get('posts.search', 'App\Http\Controllers\PostController@search')->name('posts.search');
 
-Route::resource('places', PlaceController::class)
-    ->middleware(['auth']);
 
-Route::controller(PlaceController::class)->group(function () {
-    Route::get('places/{place}/delete', 'delete')
-        ->middleware(['auth', 'can:delete,place'])
-        ->name('places.delete');
-    Route::post('/places/{place}/favs', 'favorite')
-        ->middleware(['auth', 'can:favorite,place'])
-        ->name('places.favorite');
-    Route::delete('/places/{place}/favs', 'unfavorite')
-        ->middleware(['auth', 'can:unfavorite,place'])
-        ->name('places.unfavorite');
-});
+Route::post('/places/{place}/favorites', 'App\Http\Controllers\PlaceController@favorite')
+    ->name('places.favorites')
+    ->middleware('can:create,place');
 
-// Language
-// NOTE: Localization middleware
+Route::get('/places/{place}/reviews', 'App\Http\Controllers\ReviewController@index')
+    ->name('places.reviews.index');
+Route::post('/places/{place}/reviews', 'App\Http\Controllers\ReviewController@store')
+    ->name('places.reviews.store');
+Route::delete('/places/{place}/reviews/{reviewId}', 'App\Http\Controllers\ReviewController@destroy')
+    ->name('places.reviews.destroy');
 
-Route::get('/language/{locale}', [LanguageController::class, 'language'])
-    ->name('language');
+Route::delete('/places/{place}/favorites', 'App\Http\Controllers\PlaceController@unfavorite')->name('places.unfavorites');
+
+
+Route::get('/language/{locale}', [LanguageController::class, 'language'])->name('language');
+
+
+Route::post('/posts/{post}/likes', 'App\Http\Controllers\PostController@like')->name('posts.likes');
+Route::delete('/posts/{post}/likes', 'App\Http\Controllers\PostController@unlike')->name('posts.unlike');
+
+Route::get('/about-us', function () {
+    return view('about.index');
+})->middleware(['auth', 'verified'])->name('about');
+
+Route::get('/about-cristian', function () {
+    return view('about.cristian.index');
+})->middleware(['auth', 'verified'])->name('about-cristian');
+
+Route::get('/about-gerard', function () {
+    return view('about.gerard.index');
+})->middleware(['auth', 'verified'])->name('about-gerard');
+
+Route::get('posts/{id}/comments', [CommentController::class, 'index']);
+Route::delete('posts/{id}/comments', [CommentController::class, 'destroy'])->name('comment.delete');
+Route::post('posts/{id}/comments', [CommentController::class, 'store'])->name('comment.store');
+
+require __DIR__.'/auth.php';
